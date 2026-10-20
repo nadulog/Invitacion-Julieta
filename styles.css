@@ -66,6 +66,41 @@ main { width: min(100%, 942px); margin: 0 auto; background: #000; box-shadow: 0 
 .final-date { visibility: hidden; opacity: 0; transition: opacity .55s .22s ease, visibility 0s .22s; }
 .calendar-hotspot { position: absolute; z-index: 3; left: 12.7%; right: 11.2%; top: 88.45%; height: 6%; display: block; overflow: hidden; color: transparent; background: transparent; font-size: 0; }
 .calendar-hotspot:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.date-panel { overflow: hidden; background: #000; }
+.date-reveal { position: absolute; z-index: 30; inset: 0; overflow: hidden; background: #02040c; touch-action: none; user-select: none; -webkit-user-select: none; line-height: 1.2; }
+.date-reveal.is-initialized { background: transparent; }
+.date-reveal[hidden] { display: none; }
+.date-reveal__canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; cursor: ew-resize; }
+.date-reveal__copy { position: absolute; top: 50%; left: 50%; z-index: 2; display: grid; justify-items: center; width: min(86%, 620px); translate: -50% -50%; color: #fff; text-align: center; text-shadow: 0 2px 18px #000; pointer-events: none; transition: opacity 240ms ease, transform 240ms ease; }
+.date-reveal.is-scratching .date-reveal__copy { opacity: .28; transform: scale(.98); }
+.date-reveal__copy p { margin: 0; font: 400 clamp(20px, 5.4vw, 40px)/1.25 Georgia, 'Times New Roman', serif; letter-spacing: .16em; background: linear-gradient(180deg, #fff 0%, #b9bec9 48%, #fff 68%, #8a92a6 100%); background-clip: text; -webkit-background-clip: text; color: transparent; }
+.date-reveal__copy > span:not(.date-reveal__star) { margin-top: 12px; color: #6f9cff; font-size: clamp(11px, 3vw, 17px); font-weight: 600; letter-spacing: .2em; text-transform: uppercase; text-shadow: 0 0 8px rgb(16 76 255 / .52); }
+.date-reveal__gesture { position: relative; width: min(190px, 54vw); height: 76px; margin-top: 26px; transition: opacity 180ms ease; }
+.date-reveal__gesture-trace { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; fill: none; stroke: rgb(191 199 220 / .45); stroke-width: 1; stroke-dasharray: 2 5; }
+.date-reveal__gesture > img { position: absolute; top: -19px; left: -19px; width: 44px; height: auto; filter: invert(1) drop-shadow(0 0 6px rgb(48 123 255 / .9)); mix-blend-mode: screen; offset-path: path("M154 10 C42 8 34 30 94 37 C156 44 150 68 36 66"); offset-rotate: 0deg; animation: dateGestureSwipe 2.2s ease-in-out infinite; }
+.date-reveal.has-interacted .date-reveal__gesture, .date-reveal.is-scratching .date-reveal__gesture { opacity: 0; }
+.date-reveal__button { margin-top: 26px; padding: 12px 18px; border: 0; border-bottom: 1px solid #5688ff; background: transparent; color: #fff; font-size: clamp(10px, 2.6vw, 13px); letter-spacing: .24em; pointer-events: auto; cursor: pointer; box-shadow: 0 6px 14px -10px #075dff; }
+.date-reveal__button:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+.date-reveal__star, .date-magic span, .date-sparkles span { position: absolute; aspect-ratio: 1; clip-path: polygon(50% 0, 57% 41%, 100% 50%, 57% 59%, 50% 100%, 43% 59%, 0 50%, 43% 41%); }
+.date-reveal__star { width: 15px; background: #dfe6ff; filter: drop-shadow(0 0 6px #307bff); animation: sparkleTwinkle 2.4s ease-in-out infinite; }
+.date-reveal__star--one { top: -70px; left: 8%; }
+.date-reveal__star--two { top: -32px; right: 4%; width: 10px; animation-delay: .7s; }
+.date-reveal__star--three { right: 16%; bottom: -70px; width: 12px; animation-delay: 1.3s; }
+.date-reveal.is-finishing { pointer-events: none; animation: dateCoverOut 420ms ease-in forwards; }
+.date-magic { position: absolute; top: 50%; left: 50%; z-index: 35; width: 1px; height: 1px; pointer-events: none; }
+.date-magic span { top: -9px; left: -9px; width: 18px; background: #fff; box-shadow: 0 0 12px #fff; opacity: 0; }
+.date-magic.is-active span { animation: dateMagicStar 720ms cubic-bezier(.16,1,.3,1) both; }
+.date-sparkles { position: absolute; z-index: 2; inset: 0; pointer-events: none; opacity: 0; transition: opacity .9s ease .15s; }
+.date-panel.is-revealed .date-sparkles { opacity: 1; }
+.date-sparkles span { width: var(--size); left: var(--x); top: var(--y); background: var(--color); opacity: 0; animation: sparkleTwinkle var(--duration) ease-in-out var(--delay) infinite; }
+.date-sparkles span.is-dot { clip-path: circle(50%); }
+.date-panel.is-revealed > img { animation: dateImageEnter 760ms cubic-bezier(.16,1,.3,1) both; }
+.date-panel.is-revealed-instant > img { animation: none; }
+@keyframes dateGestureSwipe { 0% { offset-distance: 0%; opacity: 0; } 10%, 88% { opacity: 1; } 100% { offset-distance: 100%; opacity: 0; } }
+@keyframes dateCoverOut { to { opacity: 0; } }
+@keyframes dateMagicStar { 0% { opacity: 0; transform: rotate(var(--angle)) translateX(0) scale(.35); } 28% { opacity: 1; } 100% { opacity: 0; transform: rotate(var(--angle)) translateX(var(--distance)) scale(1.1); } }
+@keyframes dateImageEnter { from { opacity: .4; scale: 1.04; filter: brightness(1.6); } to { opacity: 1; scale: 1; filter: brightness(1); } }
+@keyframes sparkleTwinkle { 0%, 100% { opacity: 0; transform: scale(.3) rotate(0deg); } 45% { opacity: 1; transform: scale(1) rotate(45deg); } 60% { opacity: .85; transform: scale(.85) rotate(60deg); } }
 .location-panel { overflow: hidden; background: #000; }
 .location-hotspot { position: absolute; z-index: 3; left: 22.5%; right: 22.5%; top: 72.55%; height: 7.4%; display: block; overflow: hidden; border: 0; color: transparent; background: transparent; font-size: 0; cursor: pointer; }
 .location-hotspot:focus-visible { outline: 2px solid #0875ff; outline-offset: 3px; }
@@ -228,6 +263,6 @@ main { width: min(100%, 942px); margin: 0 auto; background: #000; box-shadow: 0 
   .polaroid--4 { top: -3%; --angle: -2deg; transform: translateY(34px) rotate(-7deg); }
   .polaroid:hover { transform: translateY(-8px) rotate(0deg) scale(1.035) !important; }
 }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0ms !important; transition-duration: .01ms !important; } .vinyl { animation: none !important; transform: rotate(0deg); } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0ms !important; transition-duration: .01ms !important; } .vinyl { animation: none !important; transform: rotate(0deg); } .date-sparkles span, .date-reveal__star { animation: none !important; opacity: .85; } }
 @keyframes mobileDiscoReflectionsDrift { 0% { transform: translate3d(-5.2%, 2.8%, 0) scale(1.03); opacity: .42; } 50% { opacity: .72; } 100% { transform: translate3d(5.2%, -3%, 0) scale(1.06); opacity: .6; } }
 @keyframes galleryGlint { 0%,100% { opacity: .3; transform: scale(.7) rotate(0); } 50% { opacity: 1; transform: scale(1.25) rotate(90deg); } }

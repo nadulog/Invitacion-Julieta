@@ -43,6 +43,176 @@
   const ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Julieta XV//ES", "BEGIN:VEVENT", "UID:julieta-xv-20261219@invitacion", `DTSTART:${utc(EVENT_START)}`, `DTEND:${utc(EVENT_END)}`, "SUMMARY:Mis XV de Julieta", "END:VEVENT", "END:VCALENDAR"].join("\r\n");
   document.querySelector(".calendar-hotspot").href = URL.createObjectURL(new Blob([ics], { type: "text/calendar;charset=utf-8" }));
 
+  const datePanel = document.querySelector(".date-panel");
+  const dateReveal = datePanel.querySelector(".date-reveal");
+  const dateRevealCanvas = dateReveal.querySelector(".date-reveal__canvas");
+  const dateRevealButton = dateReveal.querySelector(".date-reveal__button");
+  const dateMagic = datePanel.querySelector(".date-magic");
+  const dateSparkles = datePanel.querySelector(".date-sparkles");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const dateRevealStorageKey = "julieta-date-revealed-v1";
+  let dateWasRevealed = false;
+  try {
+    dateWasRevealed = sessionStorage.getItem(dateRevealStorageKey) === "true";
+  } catch {
+    dateWasRevealed = false;
+  }
+
+  // Destellos que quedan titilando sobre toda la sección una vez descubierta la fecha.
+  const sparkleColors = ["#ffffff", "#ffffff", "#dfe6ff", "#8fb4ff", "#307bff"];
+  for (let i = 0; i < 110; i++) {
+    const sparkle = document.createElement("span");
+    const isDot = Math.random() < .3;
+    if (isDot) sparkle.classList.add("is-dot");
+    sparkle.style.setProperty("--x", `${(Math.random() * 96 + 2).toFixed(1)}%`);
+    sparkle.style.setProperty("--y", `${(Math.random() * 96 + 2).toFixed(1)}%`);
+    sparkle.style.setProperty("--size", `${isDot ? 3 + Math.random() * 4 : 9 + Math.random() * 20}px`);
+    sparkle.style.setProperty("--color", sparkleColors[Math.floor(Math.random() * sparkleColors.length)]);
+    sparkle.style.setProperty("--duration", `${(1.6 + Math.random() * 2.6).toFixed(2)}s`);
+    sparkle.style.setProperty("--delay", `${(Math.random() * 3).toFixed(2)}s`);
+    sparkle.style.filter = `drop-shadow(0 0 ${isDot ? 4 : 7}px ${Math.random() < .5 ? "#fff" : "#307bff"})`;
+    dateSparkles.append(sparkle);
+  }
+
+  // No se puede seguir bajando hasta descubrir la fecha.
+  let dateScrollUnlocked = dateWasRevealed;
+  let isClampingDateScroll = false;
+  let touchStartY = null;
+  const getDateGateTop = () => {
+    const bounds = datePanel.getBoundingClientRect();
+    return Math.round(bounds.top + window.scrollY + Math.max(0, (bounds.height - window.innerHeight) / 2));
+  };
+  const isAtDateGate = () => window.scrollY >= getDateGateTop() - 2;
+  const clampDateScroll = () => {
+    if (dateScrollUnlocked || isClampingDateScroll) return;
+    const dateGateTop = getDateGateTop();
+    if (window.scrollY <= dateGateTop) return;
+    isClampingDateScroll = true;
+    window.scrollTo(0, dateGateTop);
+    requestAnimationFrame(() => { isClampingDateScroll = false; });
+  };
+  window.addEventListener("scroll", clampDateScroll, { passive: true });
+  window.addEventListener("wheel", event => {
+    if (!dateScrollUnlocked && event.deltaY > 0 && isAtDateGate()) {
+      event.preventDefault();
+      clampDateScroll();
+    }
+  }, { passive: false });
+  window.addEventListener("touchstart", event => {
+    touchStartY = event.touches[0]?.clientY ?? null;
+  }, { passive: true });
+  window.addEventListener("touchmove", event => {
+    const currentY = event.touches[0]?.clientY;
+    if (!dateScrollUnlocked && touchStartY !== null && currentY !== undefined && currentY < touchStartY && isAtDateGate() && !dateReveal.contains(event.target)) {
+      event.preventDefault();
+      clampDateScroll();
+    }
+    touchStartY = currentY ?? touchStartY;
+  }, { passive: false });
+  window.addEventListener("touchend", () => { touchStartY = null; });
+  window.addEventListener("keydown", event => {
+    if (!dateScrollUnlocked && ["ArrowDown", "PageDown", "End", " "].includes(event.key) && isAtDateGate()) {
+      event.preventDefault();
+      clampDateScroll();
+    }
+  });
+  window.addEventListener("pageshow", clampDateScroll);
+
+  if (dateWasRevealed) {
+    dateReveal.hidden = true;
+    datePanel.classList.add("is-revealed", "is-revealed-instant");
+  } else {
+    const context = dateRevealCanvas.getContext("2d", { alpha: true });
+    let activePointer = null;
+    let previousPoint = null;
+    let horizontalTravel = 0;
+
+    // Capa negra espejada que se raspa con el dedo.
+    const paintDateCover = () => {
+      if (horizontalTravel > 0) return;
+      const bounds = dateReveal.getBoundingClientRect();
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+      dateRevealCanvas.width = Math.max(1, Math.round(bounds.width * pixelRatio));
+      dateRevealCanvas.height = Math.max(1, Math.round(bounds.height * pixelRatio));
+      context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      context.globalCompositeOperation = "source-over";
+      const base = context.createRadialGradient(bounds.width / 2, bounds.height * .48, 0, bounds.width / 2, bounds.height * .48, Math.max(bounds.width, bounds.height) * .7);
+      base.addColorStop(0, "#0a1d63");
+      base.addColorStop(.45, "#030a22");
+      base.addColorStop(1, "#000");
+      context.fillStyle = base;
+      context.fillRect(0, 0, bounds.width, bounds.height);
+      const specks = Math.round(bounds.width * bounds.height / 900);
+      for (let i = 0; i < specks; i++) {
+        const size = Math.random() < .85 ? 1 + Math.random() * 1.6 : 2.5 + Math.random() * 2.5;
+        context.fillStyle = Math.random() < .7 ? `rgb(220 228 255 / ${.12 + Math.random() * .45})` : `rgb(48 123 255 / ${.2 + Math.random() * .5})`;
+        context.fillRect(Math.random() * bounds.width, Math.random() * bounds.height, size, size);
+      }
+      dateReveal.classList.add("is-initialized");
+    };
+
+    const eraseBetween = (from, to) => {
+      const brush = Math.min(46, Math.max(24, dateReveal.clientWidth * .075));
+      context.globalCompositeOperation = "destination-out";
+      context.lineCap = "round";
+      context.lineJoin = "round";
+      context.lineWidth = brush * 2;
+      context.beginPath();
+      context.moveTo(from.x, from.y);
+      context.lineTo(to.x, to.y);
+      context.stroke();
+    };
+
+    const completeDateReveal = () => {
+      if (dateReveal.classList.contains("is-finishing")) return;
+      dateReveal.classList.add("is-finishing");
+      datePanel.classList.add("is-revealed");
+      if (!reducedMotion) dateMagic.classList.add("is-active");
+      try {
+        sessionStorage.setItem(dateRevealStorageKey, "true");
+      } catch {
+        // La fecha se descubre igual aunque el almacenamiento esté bloqueado.
+      }
+      window.setTimeout(() => {
+        dateReveal.hidden = true;
+        dateScrollUnlocked = true;
+      }, reducedMotion ? 280 : 450);
+    };
+
+    paintDateCover();
+    new ResizeObserver(paintDateCover).observe(dateReveal);
+
+    dateReveal.addEventListener("pointerdown", event => {
+      if (event.target === dateRevealButton) return;
+      activePointer = event.pointerId;
+      previousPoint = { x: event.offsetX, y: event.offsetY };
+      dateReveal.classList.add("has-interacted");
+      dateReveal.setPointerCapture(event.pointerId);
+    });
+    dateReveal.addEventListener("pointermove", event => {
+      if (event.pointerId !== activePointer || !previousPoint) return;
+      const nextPoint = { x: event.offsetX, y: event.offsetY };
+      const deltaX = nextPoint.x - previousPoint.x;
+      const deltaY = nextPoint.y - previousPoint.y;
+      if (Math.abs(deltaX) > Math.abs(deltaY) * 1.15) {
+        eraseBetween(previousPoint, nextPoint);
+        horizontalTravel += Math.abs(deltaX);
+        const revealProgress = horizontalTravel / (dateReveal.clientWidth * 4.6);
+        dateReveal.classList.toggle("is-scratching", revealProgress > .05);
+        if (revealProgress >= 1) completeDateReveal();
+      }
+      previousPoint = nextPoint;
+    });
+    const releaseDatePointer = event => {
+      if (event.pointerId !== activePointer) return;
+      activePointer = null;
+      previousPoint = null;
+    };
+    dateReveal.addEventListener("pointerup", releaseDatePointer);
+    dateReveal.addEventListener("pointercancel", releaseDatePointer);
+    dateRevealButton.addEventListener("click", completeDateReveal);
+  }
+
   const locationModal = document.querySelector(".location-modal");
   const locationCopyStatus = document.querySelector(".location-copy-status");
   document.querySelector("[data-open-location]").addEventListener("click", () => locationModal.showModal());
