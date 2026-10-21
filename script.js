@@ -163,6 +163,22 @@
       context.stroke();
     };
 
+    // Destellos que van quedando detrás del dedo mientras se raspa.
+    const dateRevealTrail = dateReveal.querySelector(".date-reveal__trail");
+    const trailColors = ["#ffffff", "#ffffff", "#dfe6ff", "#8fb4ff"];
+    const sparkleAt = at => {
+      for (let i = 0; i < 3; i++) {
+        const star = document.createElement("span");
+        const color = trailColors[Math.floor(Math.random() * trailColors.length)];
+        star.style.left = `${at.x + (Math.random() - .5) * 34}px`;
+        star.style.top = `${at.y + (Math.random() - .5) * 34}px`;
+        star.style.background = color;
+        star.style.boxShadow = `0 0 12px ${color}, 0 0 4px #307bff`;
+        dateRevealTrail.append(star);
+        window.setTimeout(() => star.remove(), 900);
+      }
+    };
+
     const completeDateReveal = () => {
       if (dateReveal.classList.contains("is-finishing")) return;
       dateReveal.classList.add("is-finishing");
@@ -192,6 +208,7 @@
     dateReveal.addEventListener("pointermove", event => {
       if (event.pointerId !== activePointer || !previousPoint) return;
       const nextPoint = { x: event.offsetX, y: event.offsetY };
+      if (!reducedMotion) sparkleAt(nextPoint);
       const deltaX = nextPoint.x - previousPoint.x;
       const deltaY = nextPoint.y - previousPoint.y;
       if (Math.abs(deltaX) > Math.abs(deltaY) * 1.15) {
@@ -300,6 +317,23 @@
   backgroundMusic.addEventListener("pause", syncAudioButton);
 
   const invitationIntro = document.querySelector(".invitation-intro");
+
+  // Reflejos de luz que cruzan la pista.
+  const introLights = invitationIntro.querySelector(".invitation-intro__lights");
+  const introLightColors = ["#ffffff", "#dfe8ff", "#9dbcff", "#4d8bff"];
+  for (let i = 0; i < 38; i++) {
+    const spot = document.createElement("span");
+    spot.style.setProperty("--x", `${(Math.random() * 100).toFixed(1)}%`);
+    spot.style.setProperty("--y", `${(Math.random() * 100).toFixed(1)}%`);
+    spot.style.setProperty("--size", `${(2 + Math.random() * 4).toFixed(1)}px`);
+    spot.style.setProperty("--color", introLightColors[Math.floor(Math.random() * introLightColors.length)]);
+    spot.style.setProperty("--alpha", (.45 + Math.random() * .55).toFixed(2));
+    spot.style.setProperty("--drift", `${Math.round(30 + Math.random() * 70)}px`);
+    spot.style.setProperty("--duration", `${(3 + Math.random() * 4).toFixed(2)}s`);
+    spot.style.setProperty("--delay", `${(-Math.random() * 7).toFixed(2)}s`);
+    introLights.append(spot);
+  }
+
   const enterInvitation = async withMusic => {
     if (withMusic) {
       try {

@@ -21,18 +21,24 @@
   <meta name="twitter:description" content="El 19 de diciembre cumplo mis XV y no me imagino esa noche sin vos. Te espero para bailar, brindar y celebrar juntos ✨">
   <meta name="twitter:image" content="https://bloomdate-julieta15.netlify.app/assets/compartir-whatsapp-julieta.jpg?v=2">
   <title>Julieta · Mis XV</title>
-  <link rel="preload" as="image" href="assets/intro-boliche.png">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="intro-open">
   <section class="invitation-intro" aria-labelledby="intro-title">
-    <div class="invitation-intro__backdrop" aria-hidden="true"></div>
-    <div class="invitation-intro__glow" aria-hidden="true"></div>
-    <div class="invitation-intro__burst" aria-hidden="true">
-      <img src="assets/countdown-reflections.png" alt="">
+    <div class="invitation-intro__stage" aria-hidden="true">
+      <div class="invitation-intro__beams">
+        <span style="--beam: -38deg; --beam-delay: 0s"></span>
+        <span style="--beam: -14deg; --beam-delay: -2.4s"></span>
+        <span style="--beam: 12deg; --beam-delay: -1.2s"></span>
+        <span style="--beam: 36deg; --beam-delay: -3.6s"></span>
+      </div>
+      <div class="invitation-intro__lights"></div>
+      <div class="invitation-intro__floor"></div>
     </div>
+    <div class="invitation-intro__flash" aria-hidden="true"></div>
     <div class="invitation-intro__content">
-      <p class="invitation-intro__eyebrow">XV</p>
+      <p class="invitation-intro__eyebrow">MIS</p>
+      <p class="invitation-intro__xv">XV</p>
       <h1 id="intro-title">Julieta</h1>
       <div class="invitation-intro__divider" aria-hidden="true"><span></span></div>
       <p class="invitation-intro__question">¿CÓMO QUERÉS ENTRAR?</p>
@@ -85,6 +91,7 @@
       </div>
       <div class="date-reveal" aria-label="Deslizá varias veces para descubrir la fecha">
         <canvas class="date-reveal__canvas" aria-hidden="true"></canvas>
+        <div class="date-reveal__trail" aria-hidden="true"></div>
         <div class="date-reveal__copy">
           <span class="date-reveal__star date-reveal__star--one" aria-hidden="true"></span>
           <span class="date-reveal__star date-reveal__star--two" aria-hidden="true"></span>

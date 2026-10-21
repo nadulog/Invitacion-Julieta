@@ -2,32 +2,42 @@
 * { box-sizing: border-box; }
 html { background: #090909; scroll-behavior: smooth; }
 body { margin: 0; overflow-x: hidden; background: #090909; color: var(--white); font-family: Arial, Helvetica, sans-serif; }
-body.intro-open { height: 100svh; overflow: hidden; }
 button, a { font: inherit; -webkit-tap-highlight-color: transparent; }
-.invitation-intro { position: fixed; z-index: 1000; inset: 0; display: grid; place-items: center; min-height: 100svh; overflow: hidden; background: #000; color: #fff; transition: opacity .75s ease, visibility .75s ease; }
+body.intro-open { height: 100vh; height: 100svh; overflow: hidden; }
+.invitation-intro { position: fixed; z-index: 1000; top: 0; right: 0; bottom: 0; left: 0; display: flex; flex-direction: column; align-items: center; overflow: hidden auto; background: radial-gradient(ellipse 130% 65% at 50% 0%, #0c2c96 0%, #061650 30%, #020822 62%, #000 100%); color: #fff; transition: opacity .75s ease, visibility .75s ease; }
 .invitation-intro[hidden] { display: none; }
 .invitation-intro.is-leaving { opacity: 0; visibility: hidden; pointer-events: none; }
-.invitation-intro__backdrop { position: absolute; inset: 0; background: linear-gradient(180deg, rgb(0 0 0 / .04), rgb(0 0 0 / .34)), url("assets/intro-boliche.png") center / cover no-repeat; }
-.invitation-intro__glow { position: absolute; inset: -12%; pointer-events: none; background: radial-gradient(circle at 84% 8%, rgb(255 255 255 / .18), transparent 16%), linear-gradient(112deg, transparent 22%, rgb(20 83 255 / .18) 42%, transparent 57%), radial-gradient(ellipse at 50% 58%, rgb(0 56 206 / .24), transparent 42%); mix-blend-mode: screen; animation: introGlow 5s ease-in-out infinite alternate; }
-.invitation-intro__burst { position: absolute; z-index: 6; inset: -18%; opacity: 0; pointer-events: none; mix-blend-mode: screen; }
-.invitation-intro__burst img { width: 100%; height: 100%; object-fit: cover; filter: brightness(1.8) contrast(1.28) saturate(1.35); }
-.invitation-intro.is-bursting .invitation-intro__burst { animation: introMirrorBurst .72s cubic-bezier(.16,.72,.22,1) both; }
-.invitation-intro__content { position: relative; z-index: 2; width: min(86%, 520px); padding: 30px 0; text-align: center; text-shadow: 0 3px 24px #000; }
-.invitation-intro__eyebrow { margin: 0 0 12px; font-size: clamp(16px, 4.4vw, 26px); letter-spacing: .5em; }
-.invitation-intro h1 { margin: -.12em 0 -.26em; padding: .12em .14em .26em; font: 400 clamp(68px, 19vw, 132px)/.9 Georgia, 'Times New Roman', serif; letter-spacing: -.035em; background: linear-gradient(180deg, #fff 0%, #b9bec9 42%, #fff 60%, #71798a 88%, #9aa1b2 100%); background-clip: text; -webkit-background-clip: text; color: transparent; filter: drop-shadow(0 0 18px rgb(255 255 255 / .2)); }
-.invitation-intro__divider { display: flex; align-items: center; gap: 15px; width: 68%; margin: 28px auto 30px; }
+.invitation-intro__stage { position: absolute; top: 0; right: 0; bottom: 0; left: 0; pointer-events: none; overflow: hidden; }
+.invitation-intro__beams { position: absolute; left: 50%; top: -3vh; width: 0; height: 0; }
+.invitation-intro__beams::before { content: ""; position: absolute; left: -45vw; top: -20vh; width: 90vw; height: 40vh; background: radial-gradient(ellipse at 50% 50%, rgba(150, 190, 255, .55), rgba(40, 100, 255, .2) 40%, transparent 70%); }
+.invitation-intro__beams span { position: absolute; top: 0; left: -24vw; width: 48vw; height: 135vh; transform-origin: 50% 0; transform: rotate(var(--beam)); background: linear-gradient(180deg, rgba(120, 165, 255, .5) 0%, rgba(40, 95, 255, .2) 40%, rgba(20, 70, 255, 0) 85%); -webkit-clip-path: polygon(50% 0, 100% 100%, 0 100%); clip-path: polygon(50% 0, 100% 100%, 0 100%); opacity: .55; animation: introBeam 7.2s ease-in-out var(--beam-delay) infinite alternate; }
+.invitation-intro__lights { position: absolute; top: 0; right: 0; bottom: 0; left: 0; }
+.invitation-intro__lights span { position: absolute; left: var(--x); top: var(--y); width: var(--size); height: var(--size); border-radius: 1px; background: var(--color); box-shadow: 0 0 6px var(--color); opacity: 0; animation: introLight var(--duration) linear var(--delay) infinite; }
+.invitation-intro__floor { position: absolute; left: -20%; right: -20%; bottom: -14vh; height: 38vh; background: radial-gradient(ellipse at 50% 100%, rgba(30, 90, 255, .5), rgba(10, 40, 160, .18) 45%, transparent 70%); animation: introFloor 4s ease-in-out infinite alternate; }
+.invitation-intro__flash { position: absolute; z-index: 6; top: 0; right: 0; bottom: 0; left: 0; opacity: 0; pointer-events: none; background: radial-gradient(circle at 50% 45%, #fff 0%, rgba(150, 190, 255, .85) 22%, rgba(30, 90, 255, .35) 52%, transparent 78%); }
+.invitation-intro.is-bursting .invitation-intro__flash { animation: introFlash .75s ease-out both; }
+.invitation-intro.is-bursting .invitation-intro__content { transform: scale(1.06); opacity: 0; transition: transform .6s ease, opacity .5s ease .1s; }
+.invitation-intro__content { position: relative; z-index: 3; width: min(88%, 460px); margin: auto 0; padding: calc(env(safe-area-inset-top, 0px) + 40px) 0 calc(env(safe-area-inset-bottom, 0px) + 28px); text-align: center; }
+.invitation-intro__content > * { animation: introRise .9s cubic-bezier(.2, .7, .2, 1) both; }
+.invitation-intro__eyebrow { margin: 0; padding-left: .6em; color: #b9c8ff; font-size: clamp(11px, 3vw, 14px); letter-spacing: .6em; animation-delay: .15s !important; }
+.invitation-intro__xv { margin: 2px 0 0; padding-left: .12em; font: 400 clamp(46px, min(15vw, 8vh), 84px)/1.05 Georgia, 'Times New Roman', serif; letter-spacing: .12em; color: #fff; text-shadow: 0 0 10px rgba(140, 180, 255, .9), 0 0 28px rgba(40, 110, 255, .8), 0 0 60px rgba(20, 80, 255, .55); animation-delay: .3s !important; }
+.invitation-intro h1 { margin: 0; padding: 0 .1em; font: 400 clamp(58px, min(18vw, 10vh), 120px)/1.2 Georgia, 'Times New Roman', serif; letter-spacing: 0; color: #f3f5fb; text-shadow: 0 2px 0 #8d97ad, 0 0 22px rgba(130, 170, 255, .5), 0 0 54px rgba(30, 100, 255, .4); animation-delay: .45s !important; }
+.invitation-intro__divider { display: flex; align-items: center; gap: 15px; width: 68%; margin: clamp(14px, 3vh, 26px) auto clamp(18px, 3.4vh, 30px); animation-delay: .6s !important; }
 .invitation-intro__divider::before, .invitation-intro__divider::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, #bfc7dc); }
 .invitation-intro__divider::after { background: linear-gradient(90deg, #bfc7dc, transparent); }
-.invitation-intro__divider span { width: 6px; aspect-ratio: 1; border-radius: 50%; background: #307bff; box-shadow: 0 0 13px #0866ff; }
-.invitation-intro__question { margin: 0 0 20px; color: #d7dbe7; font-size: clamp(10px, 2.8vw, 14px); letter-spacing: .3em; }
-.invitation-intro__actions { display: grid; gap: 12px; }
-.invitation-intro__actions button { min-height: 56px; border: 1px solid rgb(225 230 243 / .78); color: #fff; background: rgb(0 4 14 / .64); font-size: clamp(10px, 2.8vw, 14px); letter-spacing: .19em; cursor: pointer; backdrop-filter: blur(8px); transition: background .25s ease, border-color .25s ease, box-shadow .25s ease, transform .25s ease; }
-.invitation-intro__actions button:first-child { border-color: #5688ff; box-shadow: inset 0 -2px 0 #075dff, 0 0 20px rgb(0 72 255 / .28); }
-.invitation-intro__actions button:hover { transform: translateY(-2px); background: rgb(8 43 125 / .5); box-shadow: 0 0 24px rgb(0 84 255 / .34); }
+.invitation-intro__divider span { width: 6px; height: 6px; border-radius: 50%; background: #307bff; box-shadow: 0 0 13px #0866ff; }
+.invitation-intro__question { margin: 0 0 18px; padding-left: .3em; color: #d7dbe7; font-size: clamp(10px, 2.8vw, 14px); letter-spacing: .3em; animation-delay: .7s !important; }
+.invitation-intro__actions { display: grid; gap: 12px; animation-delay: .8s !important; }
+.invitation-intro__actions button { min-height: 54px; border: 1px solid rgba(225, 230, 243, .7); color: #fff; background: rgba(0, 6, 24, .72); font-size: clamp(10px, 2.8vw, 14px); letter-spacing: .19em; cursor: pointer; transition: background .25s ease, border-color .25s ease, box-shadow .25s ease, transform .25s ease; }
+.invitation-intro__actions button:first-child { border-color: #5688ff; box-shadow: inset 0 -2px 0 #075dff, 0 0 20px rgba(0, 72, 255, .35); }
+.invitation-intro__actions button:hover { transform: translateY(-2px); background: rgba(8, 43, 125, .6); box-shadow: 0 0 24px rgba(0, 84, 255, .4); }
 .invitation-intro__actions button:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
 .invitation-intro__actions span { color: #73a2ff; font-size: 18px; text-shadow: 0 0 10px #075dff; }
-@keyframes introGlow { from { opacity: .55; transform: translate3d(-2%, 1%, 0); } to { opacity: .95; transform: translate3d(2%, -1%, 0); } }
-@keyframes introMirrorBurst { 0% { opacity: 0; transform: scale(.72) rotate(-4deg); filter: blur(5px); } 34% { opacity: 1; } 100% { opacity: 0; transform: scale(1.32) rotate(5deg); filter: blur(0); } }
+@keyframes introBeam { from { transform: rotate(calc(var(--beam) - 14deg)); opacity: .3; } to { transform: rotate(calc(var(--beam) + 14deg)); opacity: .65; } }
+@keyframes introLight { 0% { opacity: 0; transform: translate3d(0, 0, 0); } 20%, 70% { opacity: var(--alpha); } 100% { opacity: 0; transform: translate3d(var(--drift), 0, 0); } }
+@keyframes introFloor { from { opacity: .7; } to { opacity: 1; } }
+@keyframes introFlash { 0% { opacity: 0; transform: scale(.6); } 35% { opacity: 1; } 100% { opacity: 0; transform: scale(1.5); } }
+@keyframes introRise { from { transform: translate3d(0, 22px, 0); } to { transform: none; } }
 main { width: min(100%, 942px); margin: 0 auto; background: #000; box-shadow: 0 0 38px #000; overflow-anchor: none; }
 .panel, .art-frame, .discovery { position: relative; line-height: 0; }
 .panel img, .art-frame > img { display: block; width: 100%; height: auto; }
@@ -71,6 +81,8 @@ main { width: min(100%, 942px); margin: 0 auto; background: #000; box-shadow: 0 
 .date-reveal.is-initialized { background: transparent; }
 .date-reveal[hidden] { display: none; }
 .date-reveal__canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; cursor: ew-resize; }
+.date-reveal__trail { position: absolute; z-index: 3; top: 0; right: 0; bottom: 0; left: 0; pointer-events: none; }
+.date-reveal__trail span { position: absolute; width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px; border-radius: 50%; animation: dateTrailFade .85s ease-out forwards; }
 .date-reveal__copy { position: absolute; top: 50%; left: 50%; z-index: 2; display: grid; justify-items: center; width: min(86%, 620px); translate: -50% -50%; color: #fff; text-align: center; text-shadow: 0 2px 18px #000; pointer-events: none; transition: opacity 240ms ease, transform 240ms ease; }
 .date-reveal.is-scratching .date-reveal__copy { opacity: .28; transform: scale(.98); }
 .date-reveal__copy p { margin: 0; font: 400 clamp(20px, 5.4vw, 40px)/1.25 Georgia, 'Times New Roman', serif; letter-spacing: .16em; background: linear-gradient(180deg, #fff 0%, #b9bec9 48%, #fff 68%, #8a92a6 100%); background-clip: text; -webkit-background-clip: text; color: transparent; }
@@ -100,6 +112,7 @@ main { width: min(100%, 942px); margin: 0 auto; background: #000; box-shadow: 0 
 @keyframes dateCoverOut { to { opacity: 0; } }
 @keyframes dateMagicStar { 0% { opacity: 0; transform: rotate(var(--angle)) translateX(0) scale(.35); } 28% { opacity: 1; } 100% { opacity: 0; transform: rotate(var(--angle)) translateX(var(--distance)) scale(1.1); } }
 @keyframes dateImageEnter { from { opacity: .4; scale: 1.04; filter: brightness(1.6); } to { opacity: 1; scale: 1; filter: brightness(1); } }
+@keyframes dateTrailFade { to { opacity: 0; transform: scale(.15) translateY(12px); } }
 @keyframes sparkleTwinkle { 0%, 100% { opacity: 0; transform: scale(.3) rotate(0deg); } 45% { opacity: 1; transform: scale(1) rotate(45deg); } 60% { opacity: .85; transform: scale(.85) rotate(60deg); } }
 .location-panel { overflow: hidden; background: #000; }
 .location-hotspot { position: absolute; z-index: 3; left: 22.5%; right: 22.5%; top: 72.55%; height: 7.4%; display: block; overflow: hidden; border: 0; color: transparent; background: transparent; font-size: 0; cursor: pointer; }
